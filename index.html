@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新用户引导 · 运营作战地图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0f0f1a;
+    color: #e0e0e0;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    line-height: 1.6;
+    padding-bottom: 80px;
+  }
+
+  /* ========== Header ========== */
+  .header {
+    text-align: center;
+    padding: 50px 20px 30px;
+  }
+
+  .header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #a78bfa;
+    margin-bottom: 8px;
+  }
+
+  .header .subtitle {
+    font-size: 14px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+  }
+
+  /* ========== Context Box ========== */
+  .context-box {
+    max-width: 720px;
+    margin: 20px auto 30px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 20px 28px;
+    font-size: 14px;
+    line-height: 2;
+  }
+
+  .context-box .label {
+    color: #a78bfa;
+    font-weight: 600;
+  }
+
+  .context-box .value {
+    color: rgba(255,255,255,0.6);
+  }
+
+  .context-box .highlight {
+    color: #fbbf24;
+    font-weight: 600;
+  }
+
+  .context-box .green { color: #34d399; font-weight: 600; }
+
+  /* ========== Legend ========== */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin: 10px 0 30px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .legend-dot.p0 { background: #34d399; }
+  .legend-dot.p1 { background: #fbbf24; }
+  .legend-dot.p2 { background: #60a5fa; }
+  .legend-dot.later { background: #6b7280; }
+
+  /* ========== Tabs ========== */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 0 20px 16px;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 10px 24px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03);
+    color: rgba(255,255,255,0.5);
+    transition: all 0.3s;
+    user-select: none;
+  }
+
+  .tab:hover {
+    border-color: rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7);
+  }
+
+  .tab.active {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    border-color: #8b5cf6;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .tab .priority {
+    font-size: 11px;
+    opacity: 0.7;
+    margin-left: 4px;
+  }
+
+  /* ========== Tab Content ========== */
+  .tab-content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: none;
+  }
+
+  .tab-content.active { display: block; }
+
+  .tab-title {
+    text-align: center;
+    margin: 30px 0 8px;
+  }
+
+  .tab-title h2 {
+    font-size: 22px;
+    color: #a78bfa;
+    font-weight: 600;
+  }
+
+  .tab-title .desc {
+    font-size: 14px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 4px;
+  }
+
+  /* ========== Section (Collapsible) ========== */
+  .section {
+    margin: 20px 0;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+
+  .section-header:hover {
+    background: rgba(255,255,255,0.02);
+  }
+
+  .section-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .section-info { flex: 1; }
+
+  .section-info h3 {
+    font-size: 16px;
+    color: #f0abfc;
+    font-weight: 600;
+  }
+
+  .section-info .meta {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 2px;
+  }
+
+  .section-arrow {
+    color: rgba(255,255,255,0.3);
+    font-size: 12px;
+    transition: transform 0.3s;
+  }
+
+  .section.open .section-arrow {
+    transform: rotate(180deg);
+  }
+
+  .section-body {
+    display: none;
+    padding: 0 20px 20px;
+  }
+
+  .section.open .section-body {
+    display: block;
+  }
+
+  /* ========== Card ========== */
+  .card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 12px 0;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  .badge.must { background: rgba(52, 211, 153, 0.2); color: #34d399; }
+  .badge.important { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+  .badge.nice { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
+  .badge.skip { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .card p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    margin: 4px 0;
+    line-height: 1.7;
+  }
+
+  .card .highlight {
+    color: #fbbf24;
+  }
+
+  .card .green {
+    color: #34d399;
+  }
+
+  .card .purple {
+    color: #c084fc;
+  }
+
+  .card .dim {
+    color: rgba(255,255,255,0.35);
+  }
+
+  .card .dev-cost {
+    font-size: 12px;
+    color: rgba(255,255,255,0.3);
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* ========== Not-Do Box ========== */
+  .not-do {
+    margin: 20px 0;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    border-radius: 10px;
+    padding: 16px 20px;
+  }
+
+  .not-do .label {
+    color: #f87171;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .not-do p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.7;
+  }
+
+  /* ========== Metrics Row ========== */
+  .metrics-row {
+    display: flex;
+    gap: 12px;
+    margin: 12px 0;
+    flex-wrap: wrap;
+  }
+
+  .metric {
+    flex: 1;
+    min-width: 140px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .metric .num {
+    font-size: 20px;
+    font-weight: 700;
+    color: #a78bfa;
+  }
+
+  .metric .label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 4px;
+  }
+
+  /* ========== Flow Arrow ========== */
+  .flow {
+    text-align: center;
+    color: rgba(255,255,255,0.15);
+    font-size: 20px;
+    margin: 6px 0;
+    letter-spacing: 4px;
+  }
+
+  /* ========== Inline list ========== */
+  .ilist {
+    margin: 6px 0 6px 16px;
+  }
+
+  .ilist li {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    margin: 3px 0;
+    line-height: 1.6;
+  }
+
+  .ilist li strong {
+    color: rgba(255,255,255,0.8);
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<div class="header">
+  <h1>新用户引导 · 运营作战地图</h1>
+  <div class="subtitle">五大阶段 × 可执行路径 × 优先级标注 × 开发成本估算</div>
+</div>
+
+<!-- ========== CONTEXT ========== -->
+<div class="context-box">
+  <span class="label">产品现状：</span><span class="value">DAU < 300 · Host 带量阶段 · 好友局/俱乐部为核心场景</span><br>
+  <span class="label">核心矛盾：</span><span class="highlight">社交驱动型产品，新用户进来时是社交孤岛，无人可玩即流失</span><br>
+  <span class="label">近期节点：</span><span class="value">4月更多俱乐部入驻 · PVP大厅后置 · 留存转化为重点</span><br>
+  <span class="label">方案目标：</span><span class="green">让"没人一起玩"的空窗期变成"拉人来玩"的行动期</span>
+</div>
+
+<!-- ========== LEGEND ========== -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot p0"></div>P0 当前必做</div>
+  <div class="legend-item"><div class="legend-dot p1"></div>P1 重要跟进</div>
+  <div class="legend-item"><div class="legend-dot p2"></div>P2 体验优化</div>
+  <div class="legend-item"><div class="legend-dot later"></div>后续再做</div>
+</div>
+
+<!-- ========== TABS ========== -->
+<div class="tabs">
+  <div class="tab active" data-tab="tab1">① 注册即刻 <span class="priority">P0</span></div>
+  <div class="tab" data-tab="tab2">② 引导到分享 <span class="priority">P0</span></div>
+  <div class="tab" data-tab="tab3">③ 分享体验 <span class="priority">P0</span></div>
+  <div class="tab" data-tab="tab4">④ 等待与召回 <span class="priority">P1</span></div>
+  <div class="tab" data-tab="tab5">⑤ 首局与留存 <span class="priority">P1</span></div>
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 1: 注册即刻 -->
+<!-- ================================================================ -->
+<div class="tab-content active" id="tab1">
+  <div class="tab-title">
+    <h2>① 注册即刻</h2>
+    <div class="desc">0-3分钟 · 快速建立游戏认知 + 种下"拉人来玩"的动机</div>
+  </div>
+
+  <!-- 注册奖励 -->
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(52,211,153,0.15)">🎁</div>
+      <div class="section-info">
+        <h3>注册奖励</h3>
+        <div class="meta">首次正向反馈，建立好感</div>
+      </div>
+      <div class="section-arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge must">必做</span>
+          <span class="card-title">领取注册奖励（已有）</span>
+        </div>
+        <p>新用户注册后立即发放钻石/金币奖励</p>
+        <p><span class="green">作用：</span>首次正向反馈，让用户感觉"来对了"</p>
+        <p class="dev-cost">开发成本：已实现</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 功能引导 -->
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(52,211,153,0.15)">👆</div>
+      <div class="section-info">
+        <h3>核心功能引导</h3>
+        <div class="meta">5步遮罩引导，覆盖 Tables / Club / Games 三个模块</div>
+      </div>
+      <div class="section-arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge must">必做</span>
+          <span class="card-title">Tables页 — 3步引导</span>
+        </div>
+        <p><strong>Step1</strong> 高亮 CREATE → "这里可以免费创建房间，将房间码分享给好友即可开局"</p>
+        <p><strong>Step2</strong> 高亮 JOIN → "收到好友的房间码？点这里输入，快速加入对局"</p>
+        <p><strong>Step3</strong> 高亮 Club图标 → "这里是俱乐部入口，加入好友的俱乐部或创建自己的俱乐部"</p>
+        <p class="dim">触发时机：注册奖励弹窗关闭回调后（事件驱动，非固定延迟）</p>
+        <p class="dev-cost">开发成本：1-2天</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="badge must">必做</span>
+          <span class="card-title">Club页 — 1步引导</span>
+        </div>
+        <p>高亮 "Enter Club ID" 输入框</p>
+        <p>"向好友获取俱乐部ID，输入申请加入。审批通过后会通知你"</p>
+        <p class="dim">触发时机：首次切换到Club页签，页面加载完成后</p>
+        <p class="dev-cost">开发成本：0.5天</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="badge must">必做</span>
+          <span class="card-title">Games页 — 1步引导</span>
+        </div>
+        <p>高亮主推游戏卡片</p>
+        <p>"这里是钻石小游戏专区，参与游戏需消耗钻石"</p>
+        <p class="dim">触发时机：首次切换到Games页签，页面加载完成后</p>
+        <p class="dev-cost">开发成本：0.5天</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 身份建立 -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(96,165,250,0.15)">🎭</div>
+      <div class="section-info">
+        <h3>身份建立</h3>
+        <div class="meta">个性化设置 · 沉没成本效应 · 为分享卡片提供素材</div>
+      </div>
+      <div class="section-arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge nice">优化</span>
+          <span class="card-title">引导完成后个性化设置</span>
+        </div>
+        <p>选择头像（3-5个预设角色）+ 设置昵称 + 选择常玩玩法</p>
+        <p><span class="green">作用：</span>投入时间做个性化 → 降低离开意愿（沉没成本）</p>
+        <p><span class="green">附加：</span>后续分享卡片展示头像和昵称，让分享更有"人味"</p>
+        <p class="dev-cost">开发成本：1天</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="not-do">
+    <div class="label">当前不做：</div>
+    <p>新手教学牌局（无PVP大厅承载）/ AI对战练习模式（开发成本高）/ 复杂的用户画像问卷（DAU太低没统计意义）</p>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 2: 引导到分享 -->
+<!-- ================================================================ -->
+<div class="tab-content" id="tab2">
+  <div class="tab-title">
+    <h2>② 引导到分享</h2>
+    <div class="desc">3-5分钟 · 把"没人玩"的困境转化为"我要去拉人"的行动</div>
+  </div>
+
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(52,211,153,0.15)">🎯</div>
+      <div class="section-info">
+        <h3>首日任务面板</h3>
+        <div class="meta">核心转化机制 · 给用户明确的目标链</div>
+      </div>
+      <div class="section-arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge must">必做</span>
+          <span class="card-title">任务+奖励链</span>
+        </div>
+        <p>✅ 完成注册 → <span class="highlight">+500 💎</span></p>
+        <p>⬜ 邀请1位好友 → <span class="highlight">+1000 💎</span></p>
+        <p>⬜ 完成第一局牌局 → <span class="highlight">+2000 💎</span></p>
+        <p>🏆 全部完成额外奖励 → <span class="purple">限定头像框</span></p>
+        <p><span class="green">核心逻辑：</span>把"拉人来玩"变成一个有奖励、有进度条、有目标感的任务</p>
+        <p class="dim">"立即邀请好友"作为唯一主按钮，所有UI设计指向一个动作：去拉人</p>
+        <p class="dev-cost">开发成本：2-3天（任务系统 + UI + 奖励发放）</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(251,191,36,0.15)">🤝</div>
+      <div class="section-info">
+        <h3>邀请奖励机制</h3>
+        <div class="meta">双向激励 · 邀请者和被邀请者都有收益</div>
+      </div>
+      <div class="section-arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge important">重要</span>
+          <span class="card-title">邀请双方奖励</span>
+        </div>
+        <p><strong>邀请者：</strong>每邀请1人注册 → <span class="highlight">+1000 💎</span></p>
+        <p><strong>被邀请者：</strong>通过邀请链接注册 → 额外注册奖励加成</p>
+        <p><span class="green">作用：</span>邀请者有动力持续拉人，被邀请者有额外入驻动力</p>
+        <p class="dim">需要后端支持邀请关系追踪（短期可用邀请码手动绑定）</p>
+        <p class="dev-cost">开发成本：2天（邀请码体系 + 奖励发放）</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="not-do">
+    <div class="label">当前不做：</div>
+    <p>多级邀请返利（容易被刷）/ 排行榜竞赛邀请（DAU太低）/ 付费邀请广告投放（先跑通自然裂变）</p>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 3: 分享体验 -->
+<!-- ================================================================ -->
+<div class="tab-content" id="tab3">
+  <div class="tab-title">
+    <h2>③ 分享体验</h2>
+    <div class="desc">核心中的核心 · 让"邀请好友"这个动作尽可能简单、有面子、有效</div>
+  </div>
+
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(52,211,153,0.15)">🎴</div>
+      <div class="section-info">
+        <h3>分享卡片与渠道</h3>
+        <div class="meta">可视化邀请 + 系统级分享面板</div>
+      </div>
+      <div class="section-arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge must">必做</span>
+          <span class="card-title">可视化邀请卡片</span>
+        </div>
+        <p>包含：用户头像+昵称 / 房间码 / 玩法和盲注配置 / 下载链接</p>
+        <p><span class="green">vs 现状（纯文字房间码）：</span></p>
+        <ul class="ilist">
+          <li>有"面子"——正式的邀请，不是一串冷冰冰的代码</li>
+          <li>信息完整——朋友知道这是什么，降低决策成本</li>
+          <li>有下载入口——新用户有明确行动路径</li>
+        </ul>
+        <p class="dev-cost">开发成本：2天（卡片模板 + 动态内容填充）</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="badge must">必做</span>
+          <span class="card-title">系统分享面板</span>
+        </div>
+        <p>调起 iOS Share Sheet / Android Share Intent</p>
+        <p>一键分享到 WhatsApp / Telegram / LINE / Facebook Messenger</p>
+        <p class="dim">兜底：复制链接按钮（无社交工具时）</p>
+        <p class="dev-cost">开发成本：1天（系统API调用）</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="badge must">必做</span>
+          <span class="card-title">一键建房+分享</span>
+        </div>
+        <p>点击"邀请好友" → 自动以默认配置创建房间 → 直接调起分享面板</p>
+        <p><span class="highlight">把5步操作压缩成1步：</span>创建→配置→复制码→切出游戏→发给朋友 → 点一下</p>
+        <p class="dev-cost">开发成本：1天</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(251,191,36,0.15)">📍</div>
+      <div class="section-info">
+        <h3>多场景分享入口</h3>
+        <div class="meta">不只是房间内能分享 · 处处可分享</div>
+      </div>
+      <div class="section-arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge important">重要</span>
+          <span class="card-title">分享入口布局</span>
+        </div>
+        <ul class="ilist">
+          <li><strong>创建房间后：</strong>立即弹出分享面板（最高优先级入口）</li>
+          <li><strong>房间内：</strong>常驻分享按钮</li>
+          <li><strong>Tables空状态：</strong>"创建房间并邀请好友"主按钮</li>
+          <li><strong>首日任务面板：</strong>"立即邀请好友"按钮</li>
+          <li><strong>Profile页：</strong>个人邀请码/链接展示</li>
+        </ul>
+        <p class="dev-cost">开发成本：1.5天</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="not-do">
+    <div class="label">当前不做：</div>
+    <p>分享到社群自动建群（功能过重）/ 分享视频/GIF精彩回放（需要录制系统）/ SNS广告素材自动生成</p>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 4: 等待与召回 -->
+<!-- ================================================================ -->
+<div class="tab-content" id="tab4">
+  <div class="tab-title">
+    <h2>④ 等待与召回</h2>
+    <div class="desc">分享之后 · 好友没马上来的空窗期 · 防止等待流失</div>
+  </div>
+
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(251,191,36,0.15)">⏳</div>
+      <div class="section-info">
+        <h3>等待期体验</h3>
+        <div class="meta">分享后不要让用户盯着空房间</div>
+      </div>
+      <div class="section-arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge important">重要</span>
+          <span class="card-title">等待房间状态页</span>
+        </div>
+        <p>分享成功后进入等待状态：</p>
+        <ul class="ilist">
+          <li>展示房间码 + <strong>"再次分享"</strong>按钮（发了一个人没来？再发给另一个）</li>
+          <li>"好友加入后自动通知你" → 管理预期</li>
+          <li><strong>等待期可做的事：</strong>浏览俱乐部 / 试玩Games小游戏</li>
+          <li>可退出等待 → 好友加入后Push通知拉回</li>
+        </ul>
+        <p class="dev-cost">开发成本：2天</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(251,191,36,0.15)">🔔</div>
+      <div class="section-info">
+        <h3>Push通知体系</h3>
+        <div class="meta">关键时刻把用户拉回来</div>
+      </div>
+      <div class="section-arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge important">重要</span>
+          <span class="card-title">分阶段推送策略</span>
+        </div>
+        <p><strong>T+1h</strong> 好友未加入 → "你的好友还没加入，再邀请一位朋友试试？"</p>
+        <p><strong>T+Xh</strong> <span class="green">好友加入房间</span> → "好友已加入你的房间，快来开局！"</p>
+        <p><strong>T+Xh</strong> <span class="green">好友注册了</span> → "你的好友XX已注册，邀请TA加入房间吧！"</p>
+        <p><strong>T+24h</strong> 任务未完成 → "你的首日任务还差一步，今天完成可获2000💎"</p>
+        <p class="dev-cost">开发成本：1.5天（Push通道 + 触发逻辑）</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="badge important">重要</span>
+          <span class="card-title">俱乐部审批通知</span>
+        </div>
+        <p>管理者审批通过 → Push通知 + 游戏内红点</p>
+        <p>进入俱乐部后，如有正在进行的牌局 → 引导加入</p>
+        <p class="dim">审批等待期是高流失节点，必须做好通知</p>
+        <p class="dev-cost">开发成本：1天</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(96,165,250,0.15)">📋</div>
+      <div class="section-info">
+        <h3>被邀请者体验优化</h3>
+        <div class="meta">朋友收到邀请后的加入链路</div>
+      </div>
+      <div class="section-arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge nice">优化</span>
+          <span class="card-title">剪贴板自动识别房间码</span>
+        </div>
+        <p>被邀请用户打开游戏时，自动检测剪贴板是否有房间码格式内容</p>
+        <p>弹出 "检测到房间码 XXXXX，是否加入？"</p>
+        <p><span class="green">效果：</span>最短路径加入，跳过手动查找JOIN入口</p>
+        <p class="dev-cost">开发成本：0.5天</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="not-do">
+    <div class="label">当前不做：</div>
+    <p>深度链接归因（依赖第三方SDK接入，中期推进）/ 好友在线状态（需要IM基础设施）/ 游戏内好友列表（功能过重）</p>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 5: 首局与留存 -->
+<!-- ================================================================ -->
+<div class="tab-content" id="tab5">
+  <div class="tab-title">
+    <h2>⑤ 首局与留存</h2>
+    <div class="desc">第一局完成 → 建立习惯 → 持续回来</div>
+  </div>
+
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(251,191,36,0.15)">🏆</div>
+      <div class="section-info">
+        <h3>首局完成激励</h3>
+        <div class="meta">标记里程碑 · 正向强化</div>
+      </div>
+      <div class="section-arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge important">重要</span>
+          <span class="card-title">首局完成奖励</span>
+        </div>
+        <p>完成首局后立即发放：<span class="highlight">2000 💎</span> + <span class="purple">限定头像框</span>（首日任务全完成）</p>
+        <p><span class="green">心理效果：</span>达成感 + "这个游戏值得继续玩"的正向记忆</p>
+        <p class="dev-cost">开发成本：0.5天（和首日任务系统联动）</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(96,165,250,0.15)">📅</div>
+      <div class="section-info">
+        <h3>约定下次开局</h3>
+        <div class="meta">一次性行为 → 周期性习惯</div>
+      </div>
+      <div class="section-arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge nice">优化</span>
+          <span class="card-title">"和好友约好下次开局时间"</span>
+        </div>
+        <p>首局结束后弹出：[今晚] [明天] [周末]</p>
+        <p>选择后双方收到约局提醒</p>
+        <p><span class="green">作用：</span>利用社交承诺——"跟朋友约了"比"自己想玩"的回访动力强得多</p>
+        <p class="dev-cost">开发成本：1.5天</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(251,191,36,0.15)">📱</div>
+      <div class="section-info">
+        <h3>空状态优化</h3>
+        <div class="meta">Tables页最高频停留页面 · 从"告知"变为"推动"</div>
+      </div>
+      <div class="section-arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge important">重要</span>
+          <span class="card-title">Tables空状态改版</span>
+        </div>
+        <p><strong>现状：</strong>"No active games. Create one?" + 一个灰色按钮</p>
+        <p><strong>改为：</strong></p>
+        <ul class="ilist">
+          <li><strong>[创建房间并邀请好友]</strong> — 主按钮（突出、带颜色）</li>
+          <li>[输入房间码加入] — 次按钮</li>
+          <li>💡 Tip："分享房间码给好友，即可开局"</li>
+        </ul>
+        <p><span class="green">核心变化：</span>空状态从被动的"没有游戏"变为主动的"去创建和邀请"</p>
+        <p class="dev-cost">开发成本：0.5天</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Metrics -->
+  <div class="tab-title" style="margin-top:30px">
+    <div class="desc">核心衡量指标</div>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric">
+      <div class="num">-</div>
+      <div class="label">引导完成率</div>
+    </div>
+    <div class="metric">
+      <div class="num">-</div>
+      <div class="label">首日分享率</div>
+    </div>
+    <div class="metric">
+      <div class="num">-</div>
+      <div class="label">首局完成率</div>
+    </div>
+    <div class="metric">
+      <div class="num">-</div>
+      <div class="label">Day-1 留存</div>
+    </div>
+  </div>
+  <p style="text-align:center;font-size:12px;color:rgba(255,255,255,0.25);margin-top:8px;">上线第一周建立基线 → 第2-4周对比优化</p>
+
+  <div class="not-do">
+    <div class="label">当前不做：</div>
+    <p>签到系统（DAU太低效果有限）/ 成就体系（需要大量内容填充）/ 赛季排名（等PVP大厅上线后再做）</p>
+  </div>
+</div>
+
+<!-- ========== JS ========== -->
+<script>
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Section toggle
+  function toggleSection(header) {
+    header.parentElement.classList.toggle('open');
+  }
+</script>
+</body>
+</html>
